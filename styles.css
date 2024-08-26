@@ -1,0 +1,348 @@
+html,
+body {
+    background-image: url("background.png");
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    flex-direction: column;
+    position: relative;
+}
+
+h1 {
+    font-family: Nabla;
+    margin-top: 150px;
+    font-size: 100px;
+}
+
+.card {
+    width: 400px;
+    text-align: center;
+    border-radius: 50px;
+background: linear-gradient(315deg, #460404, #530404);
+box-shadow:  -13px -13px 10px #1f0202,
+             13px 13px 10px #7d0606;
+}
+
+img {
+    height: 81%;
+    /* Set the height to match the image's height */
+    width: auto;
+    /* Auto width to maintain aspect ratio */
+    padding: 0;
+    /* Remove any padding */
+    margin: auto;
+    /* Remove any margin */
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+img:hover {
+    cursor: pointer;
+    transform: translateY(-10px);
+}
+
+.no-hover:hover {
+    transform: none;
+    cursor: default;
+}
+
+img.selected {
+    transform: translateY(-10px);
+}
+
+img.on-table {
+    position: absolute;
+    height: 150px;
+    width: auto;
+    margin: 0;
+    transform: translate(-50%, -50%);
+}
+
+
+#num_of_players {
+    height: 100%;
+    width: 100%;
+    margin-top: -250px;
+    font-family:"IBM Plex Mono";
+    color: rgb(255, 208, 0);
+    font-size: xx-large;
+    flex-direction: column;
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#playArea {
+    height: 100%;
+    width: 100%;
+}
+
+#playerEntry {
+    height: 100%;
+    width: 100%;
+
+}
+#playersName{
+    color: #ffc401;
+    display: flex;
+    flex-direction: column;
+    font-size:38px;
+    margin-top: -100px;
+  }
+#player1Name {
+    background-color: #290000;
+    width: 18%;
+    height: 50px;
+    position: relative;
+    top: -150px;
+    left: 50%;
+    transform: translateX(-55%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffc401;
+    font-size:40px;
+    border-radius: 20px;
+}
+
+#player2Name {
+    background-color: #290000;
+    border-radius: 20px;
+    color: #ffc401;
+    font-size:40px;
+    width: 18%;
+    height: 50px;
+    position: absolute;
+    top: calc(100% - 240px);
+    /* Place it near #player2Area */
+    left: 11%;
+    transform: translateX(-55%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#player1Area,
+#player2Area {
+    backdrop-filter: blur(2px) saturate(193%);
+    -webkit-backdrop-filter: blur(2px) saturate(193%);
+    background-color: rgba(114, 67, 73, 0.58);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.125);    text-align: center;
+    width: 98%;
+    height: 150px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+#player1Area {
+    top: 20px;
+}
+
+#player2Area {
+    bottom: 20px;
+}
+
+#tableArea {
+    width: 800px;
+    height: 300px;
+    background-color: lightgreen;
+    background-image: url("https://thumbs.dreamstime.com/b/brown-wooden-wall-beautiful-wood-grain-as-background-141190415.jpg");
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: calc(50% - 150px);
+
+}
+
+#selectedRank {
+    position: absolute;
+    left: 10%;
+    transform: translateX(-50%);
+    top: calc(50% - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#selectdNumbers {
+    position: absolute;
+    right: 120%;
+    transform: translateX(-50%);
+    top: calc(50% - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#put {
+    width: 100px;
+    height: 50px;
+    position: absolute;
+    left: 10%;
+    transform: translateX(-50%);
+    top: calc(50% - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#pass {
+    width: 100px;
+    height: 50px;
+    position: absolute;
+    left: 10%;
+    transform: translateX(-50%);
+    top: calc(50% - 25px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#bluff {
+    width: 100px;
+    height: 50px;
+    position: absolute;
+    left: 10%;
+    transform: translateX(-50%);
+    bottom: calc(50% - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#putted {
+    width: 50px;
+    height: 25px;
+    position: absolute;
+    left: 90%;
+    transform: translateX(-50%);
+    top: calc(50% - 10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+#selectedValues {
+    position: absolute;
+    left: 88%;
+    transform: translateX(-50%);
+    top: calc(50%-50px);
+    font-family:"IBM Plex Mono";
+    color: #ffa705;
+    font-size: 32px;
+    width: 270px;
+}
+button {
+    font-family: monospace;
+    font-size: 1.5rem;
+    color: #FAFAFA;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid #ffc401;
+    background: #5b0101;
+    box-shadow: 3px 3px #ffa705;
+    cursor: pointer;
+  }
+  
+  button:active {
+    box-shadow: none;
+    transform: translate(3px, 3px);
+  }  input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+.input {
+    background-color: #260101;
+    max-width: 50px;
+    height: 40px;
+    padding: 10px;
+    margin-top: 20px;
+    margin-bottom: 25px;
+    border: 2px solid rgb(239, 161, 15);
+    border-radius: 5px;
+    box-shadow: 3px 3px 2px rgb(249, 255, 85); 
+    font-family:"IBM Plex Mono";
+    font-size: larger;
+    text-align: center;
+    color:  rgb(251, 222, 0);
+  }
+  
+  .input:focus {
+    color: rgb(251, 222, 0);
+    background-color: #5b0505be;
+    outline-color: rgb(83, 26, 12);
+    box-shadow: -3px -3px 15px rgb(81, 9, 8);
+    transition: .1s;
+    transition-property: box-shadow;
+  }
+ 
+  .inputName{
+  background-color: #260101;
+  max-width: 400px;
+  height: 40px;
+  padding: 10px;
+  margin-top: 20px;
+  margin-bottom: 25px;
+  border: 2px solid rgb(239, 161, 15);
+  border-radius: 5px;
+  box-shadow: 3px 3px 2px rgb(249, 255, 85); 
+  font-family:"IBM Plex Mono";
+  font-size: larger;
+  text-align: center;
+  color:  rgb(251, 222, 0);
+}
+
+.inputName:focus {
+  color: rgb(251, 222, 0);
+  background-color: #5b0505be;
+  outline-color: rgb(83, 26, 12);
+  box-shadow: -3px -3px 15px rgb(81, 9, 8);
+  transition: .1s;
+  transition-property: box-shadow;
+}
+.inputvalues{
+    background: #5b0101;
+  max-width: 400px;
+  height: 40px;
+  margin-top: 20px;
+  margin-bottom: 25px;
+  border: 2px solid #ffc401;
+  border-radius: 5px;
+  box-shadow: 3px 3px #ffa705;
+  font-family:"IBM Plex Mono";
+  font-size: 15px;
+  text-align: center;
+  color:  rgb(251, 222, 0);
+}
+#result{
+    font-family: 'IBM Plex Mono';
+    color: #ffa705;
+    font-size: xx-large;
+    font-weight:bolder;
+    flex-direction: column;
+}

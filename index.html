@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Bluff</title>
+    <link href="styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <h1 class="card" id="heading">Bluff</h1>
+    <div class="view active" id="num_of_players">
+        <span>Enter Number of Players</span>
+        <input  id="number" class="input" type="number">
+        <button onclick="validateNumberOfPlayers()">
+            Next
+        </button>
+    </div>
+    </div>
+    <audio id="putcard" src="put.mp3"></audio>
+    <audio id="click" src="click-button-140881.mp3"></audio>
+    <div class="view" id="playerEntry"></div>
+    <div class="view" id="playArea"></div>
+    <div class="view" id="result">
+        <button onclick="restart()" class="ui-btn">
+            <span>
+              Restart 
+            </span>
+            you won
+          </button>
+    </div>
+
+    <script>
+        let firstTurn = 1;
+        let passNumber;
+        let passFlag = 0;
+        let player1;
+        let player2;
+        const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        const suits = ['Spades', 'Clubs', 'Diamonds', 'Hearts'];
+
+        const deck = [];
+        const discardIds = [];
+
+        suits.forEach(suit => {
+            ranks.forEach(rank => {
+                deck.push({ value: rank, imgSrc: `${rank}${suit}.svg` });
+            });
+        });
+        const playArea = document.getElementById("playArea");
+        const cardBack = 'card-back.png'; // Image for card back
+
+        let currentPlayer = 1; // 1 for Player 1, 2 for Player 2
+
+        function show(viewId) {
+            let views = document.querySelectorAll(".view");
+            views.forEach(function (view) {
+                view.classList.remove("active");
+            });
+            let selectedView = document.getElementById(viewId);
+            selectedView.classList.add("active");
+            return;
+        }
+        function playersEntry() {
+            show("playerEntry");
+            const number_of_players = document.getElementById("number").value;
+            const IntNumberOfPlayers = parseInt(number_of_players, 10);
+            if (IntNumberOfPlayers === 2) {
+                playerEntry.innerHTML += `
+                <div id="playersName">
+                <span>Player 1 name</span><input class="inputName" id="player1" type="text">
+                <span>Player 2 name</span><input class="inputName" id="player2" type="text">
+                <button onclick="distribution()">Next</button>
+                </div>
+                `
+                
+            }
+
+        }
+        function validateNumberOfPlayers() {
+            click.play();
+            const number_of_players = document.getElementById("number").value;
+            const IntNumberOfPlayers = parseInt(number_of_players, 10);
+            if (isNaN(IntNumberOfPlayers) || IntNumberOfPlayers <= 1 || IntNumberOfPlayers > 4) {
+                alert("There should be 2-4 players");
+                return;
+            }
+            playersEntry();
+        }
+        function distribution() {
+            click.play();
+document.getElementById("heading").style.display='none';
+            const number_of_players = document.getElementById("number").value;
+            const IntNumberOfPlayers = parseInt(number_of_players, 10);
+            deck.sort(() => Math.random() - 0.5);
+
+            show("playArea");
+
+            let playersHTML = "";
+
+            if (IntNumberOfPlayers == 2) {
+                player1 = deck.slice(0, 18);
+                player2 = deck.slice(18, 36);
+                passNumber = 2;
+
+                playArea.innerHTML += `
+                        <div id="player1Area"></div>
+                        <div id="player1Name">${document.getElementById('player1').value}</div>
+                        <div id="tableArea">
+                             <button id="put" disabled>Put</button>
+                             <button id="bluff">Bluff</button>
+                             <button id="pass">Pass</button>
+                             <div id="putted">
+                            <select class="inputvalues" id="selectdNumbers">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                            </select>
+                            <select class="inputvalues" id="selectedRank">
+                                <option>A</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                                <option>J</option>
+                                <option>Q</option>
+                                <option>K</option>
+                            </select>
+                        </div>
+                        </div>
+                        <div id="player2Name">${document.getElementById('player2').value}</div>
+                        <div id="player2Area"></div>
+                        
+                    <div id="selectedValues"></div>
+
+                    `;
+
+
+                const player1Area = document.getElementById("player1Area");
+                const player2Area = document.getElementById("player2Area");
+
+                for (let j = 0; j < 18; j++) {
+                    player1Area.innerHTML += `<img class="no-hover" value="${player1[j].value}" src="${player1[j].imgSrc}"  data-rank_suit=${player1[j].imgSrc} onclick="toggleSelection(this)">`;
+                    player2Area.innerHTML += `<img class="no-hover" value="${player2[j].value}" src="${player2[j].imgSrc}"  data-rank_suit=${player2[j].imgSrc} onclick="toggleSelection(this)">`;
+                }
+
+                document.getElementById("put").disabled = currentPlayer !== 1; // Enable button for Player 1
+
+            }
+        
+
+        document.getElementById("put").addEventListener("click", moveToTable);
+        document.getElementById("bluff").addEventListener("click", bluff);
+        document.getElementById("pass").addEventListener("click", pass);
+        togglePlayer();
+
+        }
+
+        function toggleSelection(card) {
+            const playerArea = currentPlayer === 1 ? document.getElementById("player1Area") : document.getElementById("player2Area");
+            if (playerArea.contains(card)) {
+                card.classList.toggle("selected");
+            }
+        }
+
+        let zIndexCounter = 1; // Initialize a z-index counter
+        let pileOffsetX = 0; // Offset for X-axis (left-right)
+        let pileOffsetY = 0; // Offset for Y-axis (up-down)
+
+        function moveToTable() {
+            putcard.play();
+            const selectedCards = document.querySelectorAll("img.selected");
+            const tableArea = document.getElementById("tableArea");
+            passFlag = 0;
+
+            if (selectedCards.length === 0) {
+                alert("Please select cards");
+                return;
+            }
+
+            if (document.getElementById("selectdNumbers").value != selectedCards.length) {
+                alert("You have selected a different number of cards than called.");
+                return;
+            }
+
+            displaySelectedValues();
+
+            selectedCards.forEach(card => {
+                card.classList.add("on-table");
+                card.classList.remove("selected");
+                card.src = cardBack;
+
+                // Add the unique identifier to the card
+                const cardId = card.getAttribute("data-id");
+
+                // Increment the z-index for each new card
+                card.style.zIndex = zIndexCounter++;
+
+                // Adjust the card's position slightly to create a pile effect
+                card.style.left = `calc(50% + ${pileOffsetX}px)`;
+                card.style.top = `calc(50% + ${pileOffsetY}px)`;
+
+                // Increase the offset for the next card
+                pileOffsetX += 10;
+                pileOffsetY += 5;
+
+                // Add the card to the table area
+                tableArea.appendChild(card);
+            });
+
+            togglePlayer();
+            console.log(player1);
+            console.log(player2);
+        }
+        function displaySelectedValues() {
+            const selectedNumber = document.getElementById("selectdNumbers").value;
+            const selectedRank = document.getElementById("selectedRank").value;
+
+            const displayArea = document.getElementById("selectedValues");
+            displayArea.classList.add("card")
+            displayArea.innerText = `Bluffing:\n${selectedNumber} card of ${selectedRank}`;
+        }
+
+
+        function togglePlayer() {
+            const player1Cards = document.querySelectorAll("#player1Area img");
+            const player2Cards = document.querySelectorAll("#player2Area img");
+            if (firstTurn == 1) {
+                player1Cards.forEach(card => card.classList.remove("no-hover"));
+                player2Cards.forEach(card => card.classList.add("no-hover"));
+                firstTurn = 0;
+                return;
+            }
+            else {
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                if (currentPlayer === 1) {
+                    player1Cards.forEach(card => card.classList.remove("no-hover"));
+                    player2Cards.forEach(card => card.classList.add("no-hover"));
+                } else {
+                    player1Cards.forEach(card => card.classList.add("no-hover"));
+                    player2Cards.forEach(card => card.classList.remove("no-hover"));
+                }
+
+            }
+        }
+
+
+
+        function pass() {
+            click.play();
+            passFlag++;
+            const player1Cards = document.querySelectorAll("#player1Area img");
+            const player2Cards = document.querySelectorAll("#player2Area img");
+            if (passFlag == passNumber) {
+                zIndexCounter = 1;
+                pileOffsetX = 0;
+                pileOffsetY = 0;
+                moveToDiscard();
+                return;
+            }
+            else {
+                if (currentPlayer == 2) {
+                    currentPlayer = 1;
+                    document.getElementById("put").disabled = false;
+                    player1Cards.forEach(card => card.classList.remove("no-hover"));
+                    player2Cards.forEach(card => card.classList.add("no-hover"));
+                }
+                else {
+                    currentPlayer = 2;
+                    document.getElementById("put").disabled = false;
+                    player1Cards.forEach(card => card.classList.add("no-hover"));
+                    player2Cards.forEach(card => card.classList.remove("no-hover"));
+                }
+            }
+        }
+
+        function moveToDiscard() {
+            const tableArea = document.getElementById("tableArea");
+            const tableCards = tableArea.querySelectorAll("img");
+
+            // Collect card IDs to discard
+            tableCards.forEach(card => {
+                tableArea.removeChild(card);
+                discardIds.push(card.getAttribute('data-rank_suit'));
+            });
+
+            // Update player1 and player2 arrays by removing discarded cards
+            player1 = player1.filter(item => !discardIds.includes(item.imgSrc));
+            player2 = player2.filter(item => !discardIds.includes(item.imgSrc));
+
+            passFlag = 0;
+            checkWinner();
+            console.log(player2)
+
+        }
+        function bluff() {
+            click.play();
+            const player1Area = document.getElementById("player1Area");
+            const player2Area = document.getElementById("player2Area");
+            const tableArea = document.getElementById("tableArea");
+            const tableCards = Array.from(tableArea.querySelectorAll("img"));
+            const selectedRank = document.getElementById("selectedRank").value;
+            let bluffSuccessful = true;
+
+            // Check if the bluff is successful
+            tableCards.forEach(card => {
+                if (card.getAttribute('value') !== selectedRank) {
+                    bluffSuccessful = false; // Bluff failed if any card's value doesn't match the selected rank
+                }
+            });
+
+            console.log(bluffSuccessful);
+
+            if (bluffSuccessful) {
+                // Bluff successful: Other player gets all table cards
+                if (currentPlayer === 1) {
+                    tableCards.forEach(card => {
+                        player1Area.appendChild(card);
+                        player1.push({
+                            id: card.getAttribute('data-rank_suit'),
+                            value: card.getAttribute('value'),
+                            imgSrc: card.getAttribute('data-rank_suit')
+                        });
+                        // Remove the card from player2's array
+                        player2 = player2.filter(card => !player1.some(p2Card => p2Card.imgSrc === card.imgSrc));
+                        card.classList.remove("on-table");
+                        card.src = `${card.getAttribute('data-rank_suit')}`; // Revealing card's front
+                    });
+                    player1 = [...new Map(player1.map(item => [item.imgSrc, item])).values()];
+                } else {
+                    tableCards.forEach(card => {
+                        player2Area.appendChild(card);
+                        player2.push({
+                            id: card.getAttribute('data-rank_suit'),
+                            value: card.getAttribute('value'),
+                            imgSrc: card.getAttribute('data-rank_suit')
+                        });
+                        // Remove the card from player1's array
+                        player1 = player1.filter(card => !player2.some(p2Card => p2Card.imgSrc === card.imgSrc));
+                        card.classList.remove("on-table");
+                        card.src = `${card.getAttribute('data-rank_suit')}`; // Revealing card's front
+                    });
+                    player2 = [...new Map(player2.map(item => [item.imgSrc, item])).values()];
+                }
+            } else {
+                // Bluff failed: Current player gets all table cards
+                if (currentPlayer === 2) {
+                    togglePlayer();
+                    tableCards.forEach(card => {
+                        player1Area.appendChild(card);
+
+                        player1.push({
+                            id: card.getAttribute('data-rank_suit'),
+                            value: card.getAttribute('value'),
+                            imgSrc: card.getAttribute('data-rank_suit')
+                        });
+                        // Remove the card from player2's array
+                        player2 = player2.filter(card => !player1.some(p2Card => p2Card.imgSrc === card.imgSrc));
+                        card.classList.remove("on-table");
+                        card.src = `${card.getAttribute('data-rank_suit')}`; // Revealing card's front
+
+                    });
+                    player1 = [...new Map(player1.map(item => [item.imgSrc, item])).values()];
+                }
+                else {
+                    togglePlayer();
+                    tableCards.forEach(card => {
+                        player2Area.appendChild(card);
+                        player2.push({
+                            id: card.getAttribute('data-rank_suit'),
+                            value: card.getAttribute('value'),
+                            imgSrc: card.getAttribute('data-rank_suit')
+                        });
+                        // Remove the card from player1's array
+                        player1 = player1.filter(card => !player2.some(p2Card => p2Card.imgSrc === card.imgSrc));
+                        card.classList.remove("on-table");
+                        card.src = `${card.getAttribute('data-rank_suit')}`; // Revealing card's front
+                    });
+                    player2 = [...new Map(player2.map(item => [item.imgSrc, item])).values()];
+                }
+            }
+
+            checkWinner();
+            passFlag = 0; // Reset pass flag
+            togglePlayer(); // Toggle the turn to the other player
+        }
+
+        function checkWinner() {
+    const player1Name = document.getElementById("player1").value;
+    const player2Name = document.getElementById("player2").value;
+
+    if (player1.length === 0) {
+        alert(`${player1Name} Wins!`);
+        show("result");
+        document.getElementById("result").innerHTML = `
+            <span>${player1Name} Wins!</span>
+            <button onclick="restart()" class="button">
+                Restart
+            </button>
+        `;
+    } else if (player2.length === 0) {
+        alert(`${player2Name} Wins!`);
+        show("result");
+        document.getElementById("result").innerHTML = `
+            <span>${player2Name} Wins!</span>
+            <button onclick="restart()" class="button">
+                Restart
+            </button>
+        `;
+    }
+}
+
+
+function restart(){
+    location.reload();
+}
+
+
+    </script>
+</body>
+
+</html>
